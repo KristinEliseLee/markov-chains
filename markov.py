@@ -1,6 +1,7 @@
 """Generate Markov text from text files."""
 
 from random import choice
+import sys
 
 
 def open_and_read_file(file_path):
@@ -16,7 +17,7 @@ def open_and_read_file(file_path):
     return whole_text
 
 
-def make_chains(text_string):
+def make_chains(text_string, n_gram):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -44,17 +45,16 @@ def make_chains(text_string):
 
     chains = {}
 
-    for index in range(len(all_words_list)-2):
-        word1 = all_words_list[index]
-        word2 = all_words_list[index + 1]
-        new_value = all_words_list[index + 2]
-        chains.setdefault((word1, word2), []).append(new_value)
+    for index in range(len(all_words_list)-n_gram):
+        chains.setdefault(tuple(all_words_list[index:n_gram + index]), []).append(
+            all_words_list[index + n_gram]
+            )
         # chains[(word1, word2)] += [new_value]
 
     return chains
 
 
-def make_text(chains):
+def make_text(chains, n_gram):
     """Return text from chains."""
     # Get the link randomly from imported dict (key) and add to the list 'words'
     # Choose random word from the list of that keys values, append new word to list
@@ -67,23 +67,24 @@ def make_text(chains):
 
     words.extend(choice(list(chains.keys())))
 
-    link = (words[-2], words[-1])
+    link = tuple(words[-n_gram:])
     while link in chains and len(words) < 1000:
         words.append(choice(chains[link]))
-        link = (words[-2], words[-1])
+        link = tuple(words[-n_gram:])
 
     return " ".join(words)
 
 
-input_path = "gettysburg.txt"
+input_path = sys.argv[1]
+n_gram = int(sys.argv[2])
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text)
+chains = make_chains(input_text, n_gram)
 
 # Produce random text
-random_text = make_text(chains)
+random_text = make_text(chains, n_gram)
 
 print(random_text)
