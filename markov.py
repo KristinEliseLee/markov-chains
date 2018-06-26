@@ -71,7 +71,7 @@ def make_text(chains, n_gram):
             break
     words.extend(first_words)
     link = tuple(words[-n_gram:])
-    while link in chains and len(words) < 20:
+    while link in chains and len(words) < 100:
         words.append(choice(chains[link]))
         link = tuple(words[-n_gram:])
     try:
