@@ -65,13 +65,21 @@ def make_text(chains, n_gram):
 
     words = []
 
-    words.extend(choice(list(chains.keys())))
-
+    while True:
+        first_words=(choice(list(chains.keys())))
+        if first_words[0][0].isupper():
+            break
+    words.extend(first_words)
     link = tuple(words[-n_gram:])
-    while link in chains and len(words) < 1000:
+    while link in chains and len(words) < 20:
         words.append(choice(chains[link]))
         link = tuple(words[-n_gram:])
-
+    try:
+        while words[-1][-1] not in(".", "!", "?"):
+            del words[-1]
+    except:
+        print("Bad Punctuation")
+        return make_text(chains, n_gram)
     return " ".join(words)
 
 
